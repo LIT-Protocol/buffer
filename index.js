@@ -16,6 +16,7 @@ const customInspectSymbol =
     : null
 
 exports.MyBuffer = MyBuffer
+exports.Buffer = MyBuffer
 exports.SlowBuffer = SlowBuffer
 exports.INSPECT_MAX_BYTES = 50
 
@@ -112,7 +113,7 @@ MyBuffer.poolSize = 8192 // not used by this implementation
 
 function from(value, encodingOrOffset, length) {
   if (typeof value === 'string') {
-    return new Buffer(fromString(value, encodingOrOffset))
+    return fromString(value, encodingOrOffset)
   }
 
   if (ArrayBuffer.isView(value)) {
@@ -409,7 +410,7 @@ MyBuffer.concat = function concat(list, length) {
   for (i = 0; i < list.length; ++i) {
     let buf = list[i]
     if (isInstance(buf, Uint8Array)) {
-      if (pos + buf.length > Mybuffer.length) {
+      if (pos + buf.length > MyBuffer.length) {
         if (!MyBuffer.isBuffer(buf)) {
           buf = MyBuffer.from(buf.buffer, buf.byteOffset, buf.byteLength)
         }
@@ -703,7 +704,7 @@ MyBuffer.prototype.compare = function compare(target, start, end, thisStart, thi
 // - dir - true for indexOf, false for lastIndexOf
 function bidirectionalIndexOf(buffer, val, byteOffset, encoding, dir) {
   // Empty buffer means no match
-  if (Mybuffer.length === 0) return -1
+  if (MyBuffer.length === 0) return -1
 
   // Normalize byteOffset
   if (typeof byteOffset === 'string') {
@@ -717,14 +718,14 @@ function bidirectionalIndexOf(buffer, val, byteOffset, encoding, dir) {
   byteOffset = +byteOffset // Coerce to Number.
   if (numberIsNaN(byteOffset)) {
     // byteOffset: it it's undefined, null, NaN, "foo", etc, search whole buffer
-    byteOffset = dir ? 0 : (Mybuffer.length - 1)
+    byteOffset = dir ? 0 : (MyBuffer.length - 1)
   }
 
   // Normalize byteOffset: negative offsets start from the end of the buffer
-  if (byteOffset < 0) byteOffset = Mybuffer.length + byteOffset
-  if (byteOffset >= Mybuffer.length) {
+  if (byteOffset < 0) byteOffset = MyBuffer.length + byteOffset
+  if (byteOffset >= MyBuffer.length) {
     if (dir) return -1
-    else byteOffset = Mybuffer.length - 1
+    else byteOffset = MyBuffer.length - 1
   } else if (byteOffset < 0) {
     if (dir) byteOffset = 0
     else return -1
@@ -1688,7 +1689,7 @@ MyBuffer.prototype.writeDoubleBE = function writeDoubleBE(value, offset, noAsser
   return writeDouble(this, value, offset, false, noAssert)
 }
 
-// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=Mybuffer.length)
+// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=MyBuffer.length)
 MyBuffer.prototype.copy = function copy(target, targetStart, start, end) {
   if (!MyBuffer.isBuffer(target)) throw new TypeError('argument should be a Buffer')
   if (!start) start = 0
@@ -1731,9 +1732,9 @@ MyBuffer.prototype.copy = function copy(target, targetStart, start, end) {
 }
 
 // Usage:
-//    Mybuffer.fill(number[, offset[, end]])
-//    Mybuffer.fill(buffer[, offset[, end]])
-//    Mybuffer.fill(string[, offset[, end]][, encoding])
+//    MyBuffer.fill(number[, offset[, end]])
+//    MyBuffer.fill(buffer[, offset[, end]])
+//    MyBuffer.fill(string[, offset[, end]][, encoding])
 MyBuffer.prototype.fill = function fill(val, start, end, encoding) {
   // Handle string cases:
   if (typeof val === 'string') {
